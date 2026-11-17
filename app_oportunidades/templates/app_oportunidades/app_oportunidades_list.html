@@ -1,0 +1,22 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}Oportunidades · Walena{% endblock %}
+{% block content %}
+<section class="opportunity-hero"><div class="container"><span class="eyebrow eyebrow-light"><span class="eyebrow-dot"></span> TALENTO QUE ENCUENTRA SU CAMINO</span><h1>Nuevas puertas,<br><em>nuevos horizontes.</em></h1><p>Oportunidades para crecer, crear y seguir aprendiendo en La Guajira y más allá.</p></div></section>
+<section class="page-section"><div class="container">
+    <div class="section-heading section-heading-compact"><div><span class="eyebrow">EXPLORA LO QUE VIENE</span><h2>Oportunidades <em>vigentes.</em></h2></div>{% if puede_gestionar %}<a class="button button-primary" href="{% url 'oportunidades_create' %}">Publicar oportunidad <span aria-hidden="true">＋</span></a>{% endif %}</div>
+    <div class="filter-bar filter-bar-simple"><form method="get" class="inline-filter"><label for="tipo-filtro">Tipo de oportunidad</label><select id="tipo-filtro" name="tipo"><option value="">Todas</option>{% for value,label in tipos %}<option value="{{ value }}" {% if tipo_seleccionado == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="button button-dark button-small" type="submit">Aplicar</button></form></div>
+    <div class="opportunity-grid opportunity-grid-large">
+        {% for oportunidad in oportunidades %}
+            <article class="opportunity-card opportunity-card-large">
+                <div class="opportunity-top"><span class="pill {% if oportunidad.tipo == 'LABORAL' %}pill-teal{% elif oportunidad.tipo == 'EMPRENDIMIENTO' %}pill-orange{% else %}pill-ochre{% endif %}">{{ oportunidad.get_tipo_display }}</span><span class="opportunity-expiry">Hasta {{ oportunidad.vigente_hasta|date:'d M Y' }}</span></div>
+                <a class="opportunity-title" href="{% url 'oportunidades_detail' oportunidad.pk %}"><h3>{{ oportunidad.titulo }}</h3></a>
+                <p>{{ oportunidad.descripcion|truncatewords:28 }}</p>
+                <div class="opportunity-meta"><span>Fuente</span><strong>{{ oportunidad.fuente }}</strong></div>
+                <div class="opportunity-card-footer"><a class="text-link" href="{% url 'oportunidades_detail' oportunidad.pk %}">Conocer más <span aria-hidden="true">→</span></a>{% if puede_gestionar and user == oportunidad.responsable or user.is_superuser %}<div class="card-actions"><a href="{% url 'oportunidades_update' oportunidad.pk %}">Editar</a><form method="post" action="{% url 'oportunidades_unpublish' oportunidad.pk %}" data-confirm="¿Despublicar esta oportunidad?">{% csrf_token %}<button type="submit">Despublicar</button></form></div>{% endif %}</div>
+            </article>
+        {% empty %}
+            <div class="empty-state opportunity-empty"><span class="empty-icon">✳</span><h3>No hay oportunidades vigentes</h3><p>Por ahora no hay convocatorias en esta categoría. Vuelve pronto para encontrar nuevos caminos.</p></div>
+        {% endfor %}
+    </div>
+</div></section>
+{% endblock %}

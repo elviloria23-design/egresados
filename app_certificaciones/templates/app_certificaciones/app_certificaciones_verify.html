@@ -1,0 +1,18 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}Verificar certificación · Walena{% endblock %}
+{% block content %}
+<section class="page-section"><div class="container verification-page">
+    <a class="back-link" href="{% url 'home' %}">← Volver al inicio</a>
+    <article class="panel verification-panel">
+        <span class="verification-mark">⌑</span><span class="eyebrow">VALIDACIÓN INSTITUCIONAL</span><h1>Verificar <em>certificación.</em></h1><p>Ingresa el código único impreso en el documento. La consulta no expone datos personales.</p>
+        {% if form %}
+            {% if form.errors %}<div class="form-errors">{{ form.errors }}</div>{% endif %}
+            <form method="post" action="{% url 'certificacion_verify_form' %}" class="verification-form">{% csrf_token %}<div class="field"><label for="{{ form.codigo.id_for_label }}">Código de verificación</label>{{ form.codigo }}{{ form.codigo.errors }}</div><button class="button button-primary" type="submit">Verificar <span aria-hidden="true">→</span></button></form>
+        {% elif certificado %}
+            <div class="verification-result {% if certificado.estado == 'VIGENTE' %}result-valid{% else %}result-invalid{% endif %}"><strong>{% if certificado.estado == 'VIGENTE' %}Documento auténtico y vigente{% else %}Documento anulado{% endif %}</strong><span>Número: {{ certificado.numero }}</span><span>Tipo: {{ certificado.tipo }}</span><span>Emitido: {{ certificado.emitida_en|date:'d M Y' }}</span>{% if certificado.estado == 'ANULADA' %}<span>Anulado: {{ certificado.anulada_en|date:'d M Y' }}</span>{% endif %}</div>
+        {% else %}
+            <div class="verification-result result-invalid"><strong>No encontramos un documento vigente con ese código.</strong><span>Comprueba que el código esté completo y vuelve a intentarlo.</span></div><a class="button button-outline" href="{% url 'certificacion_verify_form' %}">Intentar de nuevo</a>
+        {% endif %}
+    </article>
+</div></section>
+{% endblock %}

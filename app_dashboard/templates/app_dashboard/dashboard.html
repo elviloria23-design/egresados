@@ -1,0 +1,41 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}Tablero · Walena{% endblock %}
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="page-heading">
+            <div><span class="eyebrow">CENTRO INDUSTRIAL Y DE ENERGÍAS ALTERNATIVAS</span><h1>Un vistazo a nuestra <em>comunidad.</em></h1><p>Indicadores de seguimiento para orientar las próximas acciones.</p></div>
+            <a class="button button-primary" href="{% url 'reportes_dashboard' %}">Ver reportes <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="stats-grid">
+            <article class="stat-card stat-card-primary"><span class="stat-label">EGRESADOS REGISTRADOS</span><strong>{{ total_egresados }}</strong><span class="stat-caption">Registros activos en el centro</span><span class="stat-symbol">✳</span></article>
+            <article class="stat-card"><span class="stat-label">VINCULACIÓN LABORAL</span><strong>{{ vinculados }}</strong><span class="stat-caption">Con empleo reportado</span><span class="stat-symbol stat-teal">↗</span></article>
+            <article class="stat-card"><span class="stat-label">EMPRENDIMIENTOS</span><strong>{{ emprendedores }}</strong><span class="stat-caption">Egresados emprendedores</span><span class="stat-symbol stat-ochre">✦</span></article>
+            <article class="stat-card"><span class="stat-label">SEGUIMIENTO POR ACTUALIZAR</span><strong>{{ seguimiento_vencido }}</strong><span class="stat-caption">Sin actualización en 11 meses</span><span class="stat-symbol stat-muted">◷</span></article>
+        </div>
+        <div class="dashboard-grid">
+            <section class="panel">
+                <div class="panel-heading"><div><span class="eyebrow">DISTRIBUCIÓN</span><h2>Estado de seguimiento</h2></div><span class="panel-icon">↗</span></div>
+                <div class="status-list">
+                    {% for estado in estados %}
+                        <div class="status-row"><div class="status-row-head"><span>{{ estado.nombre }}</span><strong>{{ estado.cantidad }} <small>({{ estado.porcentaje }}%)</small></strong></div><div class="progress-track"><span class="progress-fill fill-{{ forloop.counter }}" style="width: {{ estado.porcentaje }}%"></span></div></div>
+                    {% endfor %}
+                </div>
+            </section>
+            <section class="panel">
+                <div class="panel-heading"><div><span class="eyebrow">ACTIVIDAD RECIENTE</span><h2>Últimos registros</h2></div><a class="text-link" href="{% url 'egresados_list' %}">Ver todos →</a></div>
+                {% if egresados_recientes %}
+                    <div class="recent-list">
+                        {% for egresado in egresados_recientes %}
+                            <a class="recent-row" href="{% url 'egresados_detail' egresado.pk %}"><span class="avatar">{{ egresado.nombres|first|upper }}{{ egresado.apellidos|first|upper }}</span><span class="recent-copy"><strong>{{ egresado.nombre_completo }}</strong><small>{{ egresado.programa.nombre }}</small></span><span class="status-dot status-{{ egresado.estado|lower }}"></span></a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-inline"><p>Aún no hay registros en tu alcance.</p><a href="{% url 'egresados_create' %}">Registra el primero →</a></div>
+                {% endif %}
+            </section>
+        </div>
+        <section class="dashboard-callout"><span class="callout-icon">✳</span><div><span class="eyebrow">COMUNIDAD ACTIVA</span><h2>{{ oportunidades_activas }} oportunidades vigentes</h2><p>Ofertas laborales, convocatorias y espacios para emprender.</p></div><a class="button button-outline" href="{% url 'oportunidades_list' %}">Explorar oportunidades <span aria-hidden="true">↗</span></a></section>
+    </div>
+</section>
+{% endblock %}

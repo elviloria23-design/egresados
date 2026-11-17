@@ -1,0 +1,19 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}Bitácora de auditoría · Walena{% endblock %}
+{% block content %}
+<section class="page-section"><div class="container">
+    <div class="page-heading page-heading-tight"><div><span class="eyebrow">TRAZABILIDAD INSTITUCIONAL</span><h1>Bitácora de <em>auditoría.</em></h1><p>Consulta eventos de acceso, actualización y emisión de documentos.</p></div><a class="button button-primary" href="{% url 'auditoria_export' %}?{{ request.GET.urlencode }}">Exportar CSV <span aria-hidden="true">↓</span></a></div>
+    <form method="get" class="filter-bar audit-filters">
+        <label><span>Acción</span><input type="text" name="accion" value="{{ filtros.accion }}" maxlength="80" placeholder="Ej. ACTUALIZAR"></label>
+        <label><span>Entidad</span><input type="text" name="entidad" value="{{ filtros.entidad }}" maxlength="100" placeholder="Egresado, Encuesta..."></label>
+        <label><span>Desde</span><input type="date" name="desde" value="{{ filtros.desde|date:'Y-m-d' }}"></label>
+        <label><span>Hasta</span><input type="date" name="hasta" value="{{ filtros.hasta|date:'Y-m-d' }}"></label>
+        <button class="button button-dark button-small" type="submit">Filtrar</button>
+    </form>
+    <div class="table-wrap"><table class="data-table audit-table"><thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Entidad</th><th>Registro</th><th>IP</th><th>Valores</th></tr></thead><tbody>
+        {% for registro in registros %}<tr><td>{{ registro.creado_en|date:'d M Y · H:i' }}</td><td>{{ registro.usuario|default:'Sistema' }}</td><td><span class="pill pill-muted">{{ registro.accion }}</span></td><td>{{ registro.entidad }}</td><td>{{ registro.entidad_id|default:'—' }}</td><td>{{ registro.direccion_ip|default:'—' }}</td><td><details><summary>Ver</summary><pre>{{ registro.valores }}</pre></details></td></tr>
+        {% empty %}<tr><td colspan="7"><div class="empty-state"><span class="empty-icon">⌕</span><h3>No hay eventos para estos filtros</h3><p>Prueba con otros criterios de búsqueda.</p></div></td></tr>{% endfor %}
+    </tbody></table></div>
+    <p class="results-note">Mostrando hasta 200 eventos por consulta.</p>
+</div></section>
+{% endblock %}

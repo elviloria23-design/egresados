@@ -1,0 +1,21 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}Reportes e indicadores · Walena{% endblock %}
+{% block content %}
+<section class="page-section"><div class="container">
+    <div class="page-heading"><div><span class="eyebrow">INFORMACIÓN PARA DECIDIR</span><h1>Indicadores de <em>seguimiento.</em></h1><p>Datos agregados y protegidos según tu rol y área de competencia.</p></div><a class="button button-primary" href="{% url 'reportes_export' %}?anio={{ anio }}&programa={{ programa_seleccionado }}">Descargar CSV <span aria-hidden="true">↓</span></a></div>
+    <form method="get" class="filter-bar report-filter">
+        <label><span>Año de grado</span><input type="number" name="anio" min="1900" max="2100" value="{{ anio }}" placeholder="Todos"></label>
+        <label><span>Programa</span><select name="programa"><option value="">Todos los programas</option>{% for programa in programas %}<option value="{{ programa.pk }}" {% if programa_seleccionado == programa.pk|stringformat:'s' %}selected{% endif %}>{{ programa.nombre }}</option>{% endfor %}</select></label>
+        <button class="button button-dark button-small" type="submit">Aplicar filtros</button>
+    </form>
+    <div class="report-summary">
+        <article class="stat-card stat-card-primary"><span class="stat-label">EGRESADOS EN EL REPORTE</span><strong>{{ total }}</strong><span class="stat-caption">Dentro del alcance seleccionado</span></article>
+        <article class="stat-card"><span class="stat-label">COBERTURA DE SEGUIMIENTO</span><strong>{{ cobertura }}%</strong><span class="stat-caption">{{ actualizados }} actualizados en los últimos 12 meses</span></article>
+    </div>
+    <div class="dashboard-grid report-grid">
+        <section class="panel"><div class="panel-heading"><div><span class="eyebrow">TRAYECTORIA</span><h2>Distribución por estado</h2></div></div><div class="status-list">{% for estado in por_estado %}<div class="status-row"><div class="status-row-head"><span>{{ estado.nombre }}</span><strong>{{ estado.cantidad }}</strong></div><div class="progress-track"><span class="progress-fill fill-{{ forloop.counter }}" style="width:{% if total %}{% widthratio estado.cantidad total 100 %}{% else %}0{% endif %}%"></span></div></div>{% endfor %}</div></section>
+        <section class="panel"><div class="panel-heading"><div><span class="eyebrow">FORMACIÓN</span><h2>Egresados por programa</h2></div></div><div class="program-report-list">{% for programa in por_programa %}<div class="program-report-row"><span>{{ programa.nombre }}</span><strong>{{ programa.cantidad }}</strong></div>{% empty %}<p class="muted">No hay información para mostrar.</p>{% endfor %}</div></section>
+    </div>
+    {% if solo_agregados %}<div class="compliance-note report-privacy"><span class="compliance-icon">⌑</span><p><strong>Vista protegida.</strong> Este reporte solo muestra resultados agregados; no incluye datos personales de egresados.</p></div>{% endif %}
+</div></section>
+{% endblock %}

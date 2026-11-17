@@ -1,0 +1,27 @@
+{% extends 'app_dashboard/base.html' %}
+{% load roles_tags %}
+{% block title %}Encuestas · Walena{% endblock %}
+{% block content %}
+<section class="page-section"><div class="container">
+    <div class="page-heading page-heading-tight">
+        <div><span class="eyebrow">SEGUIMIENTO Y ESCUCHA ACTIVA</span><h1>{% if es_egresado %}Tu voz nos ayuda a <em>crecer.</em>{% else %}Encuestas de <em>seguimiento.</em>{% endif %}</h1><p>{% if es_egresado %}Tu participación es voluntaria y tus respuestas fortalecen el acompañamiento a nuestra comunidad.{% else %}Diseña seguimientos y consulta resultados agregados de la comunidad.{% endif %}</p></div>
+        {% if not es_egresado and user|has_any_group:'Administrador,Administrativo,Funcionario' %}<a class="button button-primary" href="{% url 'encuestas_create' %}">Crear encuesta <span aria-hidden="true">＋</span></a>{% endif %}
+    </div>
+    <div class="survey-list">
+        {% for encuesta in encuestas %}
+            <article class="survey-card">
+                <div class="survey-card-main"><span class="pill {% if encuesta.esta_vigente %}pill-teal{% else %}pill-muted{% endif %}">{% if encuesta.esta_vigente %}{{ encuesta.finaliza_en|timeuntil }} restantes{% elif encuesta.publicada %}Encuesta cerrada{% else %}Borrador{% endif %}</span><h2><a href="{% url 'encuestas_detail' encuesta.pk %}">{{ encuesta.titulo }}</a></h2><p>{{ encuesta.descripcion|default:'Encuesta de seguimiento a egresados.'|truncatewords:24 }}</p><span class="survey-meta">{{ encuesta.preguntas.count }} preguntas <span>·</span> Cierra {{ encuesta.finaliza_en|date:'d M Y' }}</span></div>
+                <div class="survey-card-action">
+                    {% if es_egresado %}
+                        {% if encuesta.respondida %}<span class="pill pill-teal">Respondida ✓</span>{% else %}<a class="button button-primary button-small" href="{% url 'encuestas_answer' encuesta.pk %}">Responder <span aria-hidden="true">→</span></a>{% endif %}
+                    {% else %}
+                        <a class="button button-outline button-small" href="{% url 'encuestas_detail' encuesta.pk %}">Ver resultados <span aria-hidden="true">→</span></a>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <div class="empty-state"><span class="empty-icon">✳</span><h3>{% if es_egresado %}No tienes encuestas disponibles{% else %}Aún no hay encuestas{% endif %}</h3><p>{% if es_egresado %}Cuando una encuesta esté disponible para tu programa, aparecerá aquí.{% else %}Crea una encuesta para iniciar el siguiente seguimiento.{% endif %}</p></div>
+        {% endfor %}
+    </div>
+</div></section>
+{% endblock %}

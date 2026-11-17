@@ -1,0 +1,24 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}Carga masiva · Walena{% endblock %}
+{% block content %}
+<section class="page-section"><div class="container form-page">
+    <a class="back-link" href="{% url 'egresados_list' %}">← Volver al padrón</a>
+    <div class="page-heading page-heading-tight"><div><span class="eyebrow">REGISTRO INSTITUCIONAL</span><h1>Carga masiva <em>de egresados.</em></h1><p>Importa fichas con verificación de elegibilidad, consentimiento y alcance por programa.</p></div></div>
+    <section class="import-guide panel">
+        <div class="form-section-title"><span class="form-section-number">01</span><div><h2>Prepara el archivo</h2><p>Usa un CSV UTF-8 de hasta 5 MB y 5.000 registros.</p></div></div>
+        <p>La columna <strong>programa</strong> debe coincidir con un nombre o código activo. La fecha de grado se escribe como AAAA-MM-DD. La elegibilidad y el consentimiento se confirman con <code>si</code>; los datos sensibles requieren consentimiento separado.</p>
+        <a class="text-link" href="{% url 'egresados_import_template' %}">Descargar plantilla CSV <span aria-hidden="true">↓</span></a>
+    </section>
+    {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" enctype="multipart/form-data" class="form-card import-form">{% csrf_token %}
+        <div class="field"><label for="{{ form.archivo.id_for_label }}">{{ form.archivo.label }}</label>{{ form.archivo }}<small class="field-help">{{ form.archivo.help_text }}</small>{{ form.archivo.errors }}</div>
+        <div class="form-actions"><a class="button button-outline" href="{% url 'egresados_list' %}">Cancelar</a><button class="button button-primary" type="submit">Validar e importar <span aria-hidden="true">↗</span></button></div>
+    </form>
+    {% if resultado %}
+        <section class="import-results">
+            <div class="import-summary"><span class="eyebrow">RESULTADO DE IMPORTACIÓN</span><h2>{{ resultado.creados }} registros importados</h2><p>{{ resultado.errores|length }} filas rechazadas o pendientes de revisión.</p></div>
+            {% if resultado.errores %}<div class="table-wrap"><table class="data-table"><thead><tr><th>Fila</th><th>Documento</th><th>Errores</th></tr></thead><tbody>{% for fila in resultado.errores %}<tr><td>{{ fila.fila }}</td><td>{{ fila.documento|default:'—' }}</td><td>{% for error in fila.errores %}<div>{{ error }}</div>{% endfor %}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+        </section>
+    {% endif %}
+</div></section>
+{% endblock %}

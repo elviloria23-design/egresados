@@ -1,0 +1,20 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}{{ oportunidad.titulo }} · Walena{% endblock %}
+{% block content %}
+<section class="page-section"><div class="container detail-page">
+    <a class="back-link" href="{% url 'oportunidades_list' %}">← Volver a oportunidades</a>
+    <article class="panel opportunity-detail">
+        <span class="pill pill-teal">{{ oportunidad.get_tipo_display }}</span>
+        <h1>{{ oportunidad.titulo }}</h1>
+        <div class="opportunity-detail-meta"><span>Publicada por <strong>{{ oportunidad.responsable.get_full_name|default:oportunidad.responsable.username }}</strong></span><span>Vigente hasta <strong>{{ oportunidad.vigente_hasta|date:'d M Y' }}</strong></span></div>
+        <div class="detail-divider"></div>
+        <span class="eyebrow">SOBRE ESTA OPORTUNIDAD</span>
+        <div class="rich-copy">{{ oportunidad.descripcion|linebreaks }}</div>
+        <div class="source-box"><span class="eyebrow">FUENTE DE LA CONVOCATORIA</span><strong>{{ oportunidad.fuente }}</strong></div>
+        <div class="form-actions">
+            <a class="button button-outline" href="{% url 'oportunidades_list' %}">Volver al listado</a>
+            {% if oportunidad.enlace %}<a class="button button-primary" href="{{ oportunidad.enlace }}" target="_blank" rel="noopener noreferrer">Ir a la convocatoria <span aria-hidden="true">↗</span></a>{% endif %}
+        </div>
+    </article>
+</div></section>
+{% endblock %}

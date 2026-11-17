@@ -1,0 +1,51 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}{{ egresado.nombre_completo }} · Walena{% endblock %}
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <a class="back-link" href="{% url 'egresados_list' %}">← Volver al padrón</a>
+        <div class="profile-heading">
+            <span class="avatar avatar-large">{{ egresado.nombres|first|upper }}{{ egresado.apellidos|first|upper }}</span>
+            <div class="profile-title"><span class="eyebrow">FICHA DE EGRESADO · CC {{ egresado.documento }}</span><h1>{{ egresado.nombre_completo }}</h1><p>{{ egresado.programa.nombre }} <span class="separator-dot">·</span> Grado {{ egresado.fecha_grado|date:'Y' }}</p></div>
+            <span class="pill pill-teal">{{ egresado.get_estado_display }}</span>
+        </div>
+        <div class="profile-grid">
+            <div class="profile-main">
+                <section class="panel">
+                    <div class="panel-heading"><div><span class="eyebrow">INFORMACIÓN PERSONAL</span><h2>Datos de contacto</h2></div><a class="button button-outline button-small" href="{% url 'egresados_update' egresado.pk %}">Editar ficha <span aria-hidden="true">↗</span></a></div>
+                    <div class="detail-grid"><div class="detail-item"><span>Correo electrónico</span><a href="mailto:{{ egresado.correo }}">{{ egresado.correo }}</a></div><div class="detail-item"><span>Teléfono</span><a href="tel:{{ egresado.telefono }}">{{ egresado.telefono|default:'No registrado' }}</a></div><div class="detail-item"><span>Municipio</span><strong>{{ egresado.municipio|default:'No registrado' }}</strong></div><div class="detail-item"><span>Fecha de grado</span><strong>{{ egresado.fecha_grado|date:'d F Y' }}</strong></div><div class="detail-item"><span>Consentimiento</span><strong>{% if egresado.consentimiento %}Autorizado{% else %}No registrado{% endif %}</strong></div><div class="detail-item"><span>Último seguimiento</span><strong>{{ egresado.ultima_actualizacion|date:'d M Y' }}</strong></div></div>
+                </section>
+                <section class="panel">
+                    <div class="panel-heading"><div><span class="eyebrow">HISTORIAL</span><h2>Cambios de estado</h2></div><span class="panel-icon">◷</span></div>
+                    <div class="timeline">
+                        {% for cambio in historial %}<article class="timeline-item"><span class="timeline-marker"></span><div><div class="timeline-head"><strong>{{ cambio.get_estado_nuevo_display }}</strong><time>{{ cambio.creado_en|date:'d M Y · H:i' }}</time></div><p>{{ cambio.justificacion }}</p><small>{{ cambio.usuario|default:'Sistema' }}</small></div></article>{% empty %}<p class="muted">Aún no hay cambios de estado registrados.</p>{% endfor %}
+                    </div>
+                </section>
+                <section class="panel">
+                    <div class="panel-heading"><div><span class="eyebrow">TRAZABILIDAD</span><h2>Intentos de contacto</h2></div></div>
+                    <div class="contact-history">
+                        {% for intento in intentos %}<div class="contact-row"><div><strong>{{ intento.get_resultado_display }}</strong><small>{{ intento.medio }} · {{ intento.usuario|default:'Sistema' }}</small></div><time>{{ intento.fecha|date:'d M Y' }}</time></div>{% empty %}<p class="muted">Todavía no se registran intentos de contacto.</p>{% endfor %}
+                    </div>
+                </section>
+            </div>
+            <aside class="profile-sidebar">
+                <section class="panel sidebar-panel"><span class="eyebrow">REGISTRAR SEGUIMIENTO</span><h2>¿Hablaste con este egresado?</h2><p class="muted">Deja constancia del medio y resultado del contacto.</p>
+                    <form method="post" action="{% url 'egresados_contacto' egresado.pk %}" class="form-stack">
+                        {% csrf_token %}
+                        {% for field in form_contacto %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>{% endfor %}
+                        <button class="button button-dark button-wide" type="submit">Guardar intento</button>
+                    </form>
+                </section>
+                <section class="panel sidebar-panel"><span class="eyebrow">ACTUALIZAR ESTADO</span><h2>Registrar novedad</h2>
+                    <form method="post" action="{% url 'egresados_estado' egresado.pk %}" class="form-stack">
+                        {% csrf_token %}
+                        {% for field in form_estado %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>{% endfor %}
+                        <button class="button button-outline button-wide" type="submit">Guardar cambio</button>
+                    </form>
+                </section>
+                {% if puede_baja %}<section class="danger-panel"><span class="eyebrow">GESTIÓN DEL REGISTRO</span><h3>Baja lógica</h3><p>El registro no se elimina físicamente y puede restaurarse.</p><form method="post" action="{% url 'egresados_baja' egresado.pk %}" data-confirm="¿Aplicar baja lógica a este egresado?">{% csrf_token %}<label class="sr-only" for="motivo-baja">Motivo de baja</label><textarea id="motivo-baja" name="motivo" rows="2" minlength="8" required placeholder="Motivo de baja (obligatorio)"></textarea><button class="button button-danger button-small" type="submit">Dar de baja</button></form></section>{% endif %}
+            </aside>
+        </div>
+    </div>
+</section>
+{% endblock %}

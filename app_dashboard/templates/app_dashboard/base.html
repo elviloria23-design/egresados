@@ -1,0 +1,107 @@
+{% load static roles_tags %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#fdfcf7">
+    <meta name="description" content="Portal de seguimiento y oportunidades para egresados del CIEA SENA La Guajira.">
+    <link rel="icon" type="image/svg+xml" href="{% static 'app_dashboard/img/favicon.svg' %}">
+    <title>{% block title %}Walena · Talento y Hospitalidad{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'app_dashboard/css/app_dashboard.css' %}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="{% url 'home' %}" aria-label="Walena, ir al inicio">
+                <span class="brand-mark" aria-hidden="true">W</span>
+                <span class="brand-copy">
+                    <strong>walena</strong>
+                    <span>talento & hospitalidad</span>
+                </span>
+            </a>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">
+                <span class="sr-only">Abrir navegación</span>
+                <span></span><span></span><span></span>
+            </button>
+            <nav class="primary-nav" id="primary-nav" aria-label="Principal">
+                <a href="{% url 'oportunidades_list' %}">Oportunidades</a>
+                {% if user.is_authenticated %}
+                    {% if user|has_any_group:'Administrador,Administrativo,Funcionario,Visor' %}
+                        <a href="{% url 'dashboard' %}">Tablero</a>
+                    {% endif %}
+                    {% if user|has_any_group:'Administrador,Administrativo,Funcionario' %}
+                        <a href="{% url 'egresados_list' %}">Egresados</a>
+                    {% endif %}
+                    {% if user|has_any_group:'Administrador,Administrativo,Funcionario' %}
+                        <a href="{% url 'egresados_pendientes' %}">Verificaciones</a>
+                    {% endif %}
+                    {% if user|has_any_group:'Administrador,Administrativo,Funcionario,Visor,Egresado' %}
+                        <a href="{% url 'encuestas_list' %}">Encuestas</a>
+                    {% endif %}
+                    {% if user|has_any_group:'Administrador,Administrativo,Funcionario,Visor,Egresado' %}
+                        <a href="{% url 'certificaciones_list' %}">Certificados</a>
+                    {% endif %}
+                    {% if user|has_any_group:'Administrador,Administrativo,Funcionario,Visor' %}
+                        <a href="{% url 'reportes_dashboard' %}">Reportes</a>
+                    {% endif %}
+                    {% if user|has_any_group:'Administrador,Administrativo' %}
+                        <a href="{% url 'auditoria_list' %}">Auditoría</a>
+                    {% endif %}
+                    {% if user|has_any_group:'Egresado' %}
+                        <a href="{% url 'egresados_self_update' %}">Mi perfil</a>
+                    {% endif %}
+                    <form class="nav-logout" method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button class="button button-outline button-small" type="submit">Salir</button>
+                    </form>
+                {% else %}
+                    <a class="button button-primary button-small" href="{% url 'login' %}">Ingresar <span aria-hidden="true">↗</span></a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+    <main id="contenido">
+        {% if messages %}
+            <div class="container message-stack" aria-live="polite">
+                {% for message in messages %}
+                    <div class="message message-{{ message.tags|default:'info' }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <a class="brand brand-footer" href="{% url 'home' %}">
+                <span class="brand-mark" aria-hidden="true">W</span>
+                <span class="brand-copy"><strong>walena</strong><span>talento & hospitalidad</span></span>
+            </a>
+            <p>Centro Industrial y de Energías Alternativas · SENA Regional La Guajira</p>
+            <span class="footer-note">Atendemos con pasión.</span>
+        </div>
+    </footer>
+    <script>
+        const navToggle = document.querySelector('.nav-toggle');
+        const primaryNav = document.querySelector('.primary-nav');
+        if (navToggle && primaryNav) {
+            navToggle.addEventListener('click', () => {
+                const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
+                navToggle.setAttribute('aria-expanded', String(!isOpen));
+                primaryNav.classList.toggle('is-open', !isOpen);
+            });
+        }
+        document.querySelectorAll('[data-confirm]').forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                if (!window.confirm(form.dataset.confirm)) event.preventDefault();
+            });
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

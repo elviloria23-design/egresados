@@ -1,0 +1,31 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}{{ encuesta.titulo }} · Walena{% endblock %}
+{% block content %}
+<section class="page-section"><div class="container detail-page">
+    <a class="back-link" href="{% url 'encuestas_list' %}">← Volver a encuestas</a>
+    <article class="panel survey-detail">
+        <span class="pill {% if encuesta.esta_vigente %}pill-teal{% else %}pill-muted{% endif %}">{% if encuesta.esta_vigente %}Publicada{% elif encuesta.publicada %}Cerrada{% else %}Borrador{% endif %}</span>
+        <h1>{{ encuesta.titulo }}</h1><p class="survey-description">{{ encuesta.descripcion|default:'Encuesta de seguimiento a egresados.' }}</p>
+        <div class="survey-detail-meta"><span>Inicio <strong>{{ encuesta.inicia_en|date:'d M Y' }}</strong></span><span>Cierre <strong>{{ encuesta.finaliza_en|date:'d M Y' }}</strong></span><span>Respuestas <strong>{{ respuestas }}</strong></span></div>
+        <div class="survey-question-list"><h2>Preguntas</h2>{% for pregunta in encuesta.preguntas.all %}<div class="survey-question"><span class="question-number">0{{ forloop.counter }}</span><div><strong>{{ pregunta.texto }}</strong><small>{{ pregunta.get_tipo_display }}{% if pregunta.obligatoria %} · Obligatoria{% else %} · Opcional{% endif %}</small></div></div>{% empty %}<p>No se han configurado preguntas.</p>{% endfor %}</div>
+        {% if puede_editar %}
+            <div class="survey-actions">
+                {% if not respuestas %}<a class="button button-outline button-small" href="{% url 'encuestas_update' encuesta.pk %}">Editar encuesta</a>{% endif %}
+                <form method="post" action="{% url 'encuestas_publish' encuesta.pk %}">{% csrf_token %}<button class="button {% if encuesta.publicada %}button-dark{% else %}button-primary{% endif %} button-small" type="submit">{% if encuesta.publicada %}Cerrar encuesta{% else %}Publicar encuesta{% endif %}</button></form>
+            </div>
+            {% if resultados %}
+                <section class="survey-results"><span class="eyebrow">RESPUESTAS AGREGADAS</span><h2>Lo que comparte la comunidad</h2>
+                    {% for grupo in resultados %}
+                        <article class="result-question"><h3>{{ grupo.pregunta.texto }}</h3>
+                            {% for fila in grupo.conteo %}
+                                <div class="result-row"><span>{{ fila.valor|default:'Sin respuesta' }}</span><strong>{{ fila.total }}</strong></div>
+                            {% empty %}<p class="muted">Todavía no hay respuestas para esta pregunta.</p>
+                            {% endfor %}
+                        </article>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endif %}
+    </article>
+</div></section>
+{% endblock %}

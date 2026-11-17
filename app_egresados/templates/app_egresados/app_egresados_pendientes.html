@@ -1,0 +1,15 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}Verificaciones · Walena{% endblock %}
+{% block content %}
+<section class="page-section"><div class="container">
+    <a class="back-link" href="{% url 'dashboard' %}">← Volver al tablero</a>
+    <div class="page-heading page-heading-tight"><div><span class="eyebrow">CALIDAD DEL DATO</span><h1>Actualizaciones por <em>verificar.</em></h1><p>Los cambios de situación reportados por egresados esperan validación del equipo.</p></div></div>
+    <div class="review-list">
+        {% for pendiente in pendientes %}
+            <article class="review-card"><div class="review-person"><span class="avatar">{{ pendiente.egresado.nombres|first|upper }}{{ pendiente.egresado.apellidos|first|upper }}</span><div><strong>{{ pendiente.egresado.nombre_completo }}</strong><small>{{ pendiente.egresado.programa.nombre }} · {{ pendiente.creado_en|date:'d M Y' }}</small></div></div><div class="review-status"><span class="eyebrow">SITUACIÓN REPORTADA</span><strong>{{ pendiente.valores.estado }}</strong></div><form method="post" action="{% url 'egresados_verificar' pendiente.pk %}">{% csrf_token %}<button class="button button-primary button-small" type="submit">Verificar <span aria-hidden="true">✓</span></button></form></article>
+        {% empty %}
+            <div class="empty-state"><span class="empty-icon">✓</span><h3>Todo al día</h3><p>No hay actualizaciones pendientes dentro de tu alcance.</p></div>
+        {% endfor %}
+    </div>
+</div></section>
+{% endblock %}

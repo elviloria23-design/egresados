@@ -1,0 +1,13 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}Certificaciones · Walena{% endblock %}
+{% block content %}
+<section class="page-section"><div class="container">
+    <div class="page-heading page-heading-tight"><div><span class="eyebrow">DOCUMENTOS VERIFICABLES</span><h1>Certificaciones <em>institucionales.</em></h1><p>Consulta, descarga o verifica documentos emitidos por el CIEA.</p></div>{% if puede_emitir %}<a class="button button-primary" href="{% url 'certificaciones_create' %}">Emitir certificación <span aria-hidden="true">＋</span></a>{% endif %}</div>
+    <div class="table-wrap"><table class="data-table"><thead><tr><th>Número</th><th>Tipo</th><th>Egresado</th><th>Fecha</th><th>Estado</th><th>Documento</th></tr></thead><tbody>
+        {% for certificado in certificaciones %}
+            <tr><td><strong>{{ certificado.numero }}</strong></td><td>{{ certificado.tipo }}</td><td>{{ certificado.egresado.nombre_completo }}</td><td>{{ certificado.emitida_en|date:'d M Y' }}</td><td><span class="pill {% if certificado.estado == 'VIGENTE' %}pill-teal{% else %}pill-muted{% endif %}">{{ certificado.get_estado_display }}</span></td><td><a class="text-link" href="{% url 'certificacion_pdf' certificado.pk %}">Descargar PDF ↗</a>{% if puede_anular and certificado.estado == 'VIGENTE' %}<form method="post" action="{% url 'certificacion_anular' certificado.pk %}" class="inline-revoke" data-confirm="¿Anular esta certificación?"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"><label class="sr-only" for="motivo-{{ certificado.pk }}">Motivo de anulación</label><input id="motivo-{{ certificado.pk }}" name="motivo" minlength="8" maxlength="500" required placeholder="Motivo de anulación"><button type="submit">Anular</button></form>{% endif %}</td></tr>
+        {% empty %}<tr><td colspan="6"><div class="empty-state"><span class="empty-icon">⌑</span><h3>No hay certificaciones todavía</h3><p>Los documentos emitidos aparecerán en este listado.</p></div></td></tr>{% endfor %}
+    </tbody></table></div>
+    {% if puede_emitir %}<section class="panel certificate-verify-callout"><div><span class="eyebrow">VALIDACIÓN PÚBLICA</span><h2>Comprueba la autenticidad de un documento</h2></div><a class="button button-outline" href="{% url 'certificacion_verify_form' %}">Verificar código <span aria-hidden="true">↗</span></a></section>{% endif %}
+</div></section>
+{% endblock %}

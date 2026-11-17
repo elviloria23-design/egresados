@@ -1,0 +1,68 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}Walena · Egresados que transforman La Guajira{% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <span class="eyebrow"><span class="eyebrow-dot"></span> CIEA · SENA REGIONAL LA GUAJIRA</span>
+            <h1>Tu talento abre caminos.<br><em>Sigamos conectados.</em></h1>
+            <p class="hero-lead">Una comunidad para acompañar tu camino, compartir oportunidades y celebrar todo lo que puedes lograr.</p>
+            <div class="hero-actions">
+                <a class="button button-primary" href="{% url 'login' %}">Ingresa a tu portal <span aria-hidden="true">↗</span></a>
+                <a class="button button-text" href="{% url 'oportunidades_list' %}">Explorar oportunidades <span aria-hidden="true">→</span></a>
+            </div>
+            <div class="hero-trust"><span class="trust-icon" aria-hidden="true">✦</span><span>Un espacio creado para el talento de nuestra región</span></div>
+        </div>
+        <div class="hero-art" aria-label="Ilustración abstracta del paisaje guajiro">
+            <div class="sun"></div>
+            <div class="art-label art-label-top"><span class="tiny-star">✳</span> TALENTO QUE TRASCIENDE</div>
+            <div class="dune dune-back"></div>
+            <div class="dune dune-front"></div>
+            <div class="art-card">
+                <span class="art-card-icon">↗</span>
+                <span><strong>Tu próximo capítulo</strong><small>empieza aquí</small></span>
+            </div>
+            <div class="art-label art-label-bottom">LA GUAJIRA · COLOMBIA</div>
+            <span class="art-spark spark-one">✦</span><span class="art-spark spark-two">✳</span>
+        </div>
+    </div>
+</section>
+<section class="section section-warm">
+    <div class="container">
+        <div class="section-heading">
+            <div><span class="eyebrow">UN PUNTO DE ENCUENTRO</span><h2>Mucho por hacer,<br><em>juntos.</em></h2></div>
+            <p>Tu historia no termina al graduarte. Conectamos a nuestros egresados con nuevos caminos para crecer, crear y seguir aprendiendo.</p>
+        </div>
+        <div class="feature-grid">
+            <article class="feature-card"><span class="feature-icon icon-teal">⌁</span><span class="eyebrow">COMUNIDAD</span><h3>Seguimos cerca</h3><p>Actualiza tus datos y mantén vivo el vínculo con tu centro y tus compañeros.</p><span class="feature-index">01</span></article>
+            <article class="feature-card feature-card-highlight"><span class="feature-icon icon-orange">↗</span><span class="eyebrow">OPORTUNIDADES</span><h3>Tu siguiente paso</h3><p>Descubre ofertas laborales, convocatorias y recursos para emprender.</p><a class="text-link" href="{% url 'oportunidades_list' %}">Ver oportunidades <span aria-hidden="true">→</span></a><span class="feature-index">02</span></article>
+            <article class="feature-card"><span class="feature-icon icon-ochre">✳</span><span class="eyebrow">TALENTO LOCAL</span><h3>Hecho en La Guajira</h3><p>Historias de talento, creatividad y transformación que nacen en nuestra tierra.</p><span class="feature-index">03</span></article>
+        </div>
+    </div>
+</section>
+<section class="section opportunities-preview">
+    <div class="container">
+        <div class="section-heading section-heading-compact">
+            <div><span class="eyebrow">LO QUE VIENE</span><h2>Oportunidades <em>para ti.</em></h2></div>
+            <a class="text-link" href="{% url 'oportunidades_list' %}">Todas las oportunidades <span aria-hidden="true">→</span></a>
+        </div>
+        {% if oportunidades %}
+            <div class="opportunity-grid">
+                {% for oportunidad in oportunidades %}
+                    <a class="opportunity-card" href="{% url 'oportunidades_detail' oportunidad.pk %}">
+                        <span class="pill pill-teal">{{ oportunidad.get_tipo_display }}</span>
+                        <h3>{{ oportunidad.titulo }}</h3>
+                        <p>{{ oportunidad.descripcion|truncatewords:18 }}</p>
+                        <span class="card-foot">Vigente hasta {{ oportunidad.vigente_hasta|date:'d M Y' }} <span aria-hidden="true">↗</span></span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state"><span class="empty-icon">✳</span><h3>Pronto habrá nuevas oportunidades</h3><p>Vuelve a visitarnos para descubrir las próximas convocatorias.</p></div>
+        {% endif %}
+    </div>
+</section>
+<section class="closing-banner">
+    <div class="container closing-inner"><div><span class="eyebrow">ESTE ESPACIO TAMBIÉN ES TUYO</span><h2>La comunidad crece<br>cuando <em>seguimos en contacto.</em></h2></div><a class="button button-light" href="{% url 'login' %}">Entrar a mi portal <span aria-hidden="true">↗</span></a></div>
+</section>
+{% endblock %}

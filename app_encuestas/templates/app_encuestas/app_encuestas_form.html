@@ -1,0 +1,35 @@
+{% extends 'app_dashboard/base.html' %}
+{% block title %}{{ titulo }} · Walena{% endblock %}
+{% block content %}
+<section class="page-section"><div class="container form-page">
+    <a class="back-link" href="{% url 'encuestas_list' %}">← Volver a encuestas</a>
+    <div class="page-heading page-heading-tight"><div><span class="eyebrow">SEGUIMIENTO A EGRESADOS</span><h1>{{ titulo }}</h1><p>Elige a quién invitar, define las fechas y agrega preguntas.</p></div></div>
+    <form method="post" class="form-card">{% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+        <div class="form-grid">
+            {% for field in form %}
+                <div class="field {% if field.name == 'descripcion' or field.name == 'programas' %}field-full{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>
+            {% endfor %}
+        </div>
+        <section class="question-section">
+            <div class="form-section-title"><span class="form-section-number">02</span><div><h2>Preguntas</h2><p>Las preguntas se presentan en el orden indicado.</p></div></div>
+            {{ formset.management_form }}
+            {% if formset.non_form_errors %}<div class="form-errors">{{ formset.non_form_errors }}</div>{% endif %}
+            {% for pregunta in formset %}
+                <article class="question-editor">
+                    {% for hidden in pregunta.hidden_fields %}{{ hidden }}{% endfor %}
+                    <div class="question-editor-head"><span class="question-number">Pregunta {{ forloop.counter }}</span>{% if pregunta.DELETE %}<label class="delete-question">{{ pregunta.DELETE }} Eliminar</label>{% endif %}</div>
+                    <div class="form-grid">
+                        {% for field in pregunta.visible_fields %}
+                            {% if field.name != 'DELETE' %}
+                                <div class="field {% if field.name == 'texto' or field.name == 'opciones_texto' %}field-full{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+        <div class="form-actions"><a class="button button-outline" href="{% url 'encuestas_list' %}">Cancelar</a><button class="button button-primary" type="submit">Guardar encuesta <span aria-hidden="true">↗</span></button></div>
+    </form>
+</div></section>
+{% endblock %}
